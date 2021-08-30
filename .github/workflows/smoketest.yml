@@ -5,6 +5,7 @@ name: SmokeTests
 on:
   workflow_run:
     workflows: ["container-reg"]
+    branches: [main]
     types: 
       - completed
 jobs:
