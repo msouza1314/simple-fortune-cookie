@@ -5,7 +5,7 @@ env:
 name: Container Reg
 on: [push, pull_request]
 jobs:
-  docker-test:
+  docker-build:
     name: build docker images
     runs-on: ubuntu-latest
     steps:
@@ -20,5 +20,18 @@ jobs:
         run: docker push "$docker_username/simple-fortune-cookie:backend"
       - name: push frontend
         run: docker push "$docker_username/simple-fortune-cookie:frontend"
-
+  smoke-test:
+    needs: docker-build
+    name: build docker images and curl 8080
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-run
+        run: docker-compose up -d
+      - name: test-frontend
+        run: curl -s 172.17.0.1:8080 | grep "Fortune cookie application"
+      - name: test-backend
+        run: curl -s 172.17.0.1:9000/fortunes | grep -v "404"
+      - name: docker-stop
+        run: docker-compose down
       
