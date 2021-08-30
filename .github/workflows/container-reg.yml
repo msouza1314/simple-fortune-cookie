@@ -25,6 +25,7 @@ jobs:
     name: build docker images and curl 8080
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: docker-run
         run: docker-compose up -d
       - name: test
