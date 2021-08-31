@@ -15,29 +15,29 @@ jobs:
     name: build docker images
     runs-on: ubuntu-latest
     env:
-      VERSION: ${GITHUB_REF##*/}
+      REF: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v2
       - name: build-backend
-        run: docker build -t "$docker_username/simple-fortune-cookie:backend-${VERSION}" -f backend.Dockerfile .
+        run: VERSION=${REF##*/} docker build -t "$docker_username/simple-fortune-cookie:backend-${VERSION}" -f backend.Dockerfile .
       - name: build-frontend
-        run: docker build -t "$docker_username/simple-fortune-cookie:frontend-${VERSION}" .
+        run: VERSION=${REF##*/} docker build -t "$docker_username/simple-fortune-cookie:frontend-${VERSION}" .
       - name: docker-login
         run: echo "$docker_password" | docker login --username "$docker_username" --password-stdin
       - name: push backend
-        run: docker push "$docker_username/simple-fortune-cookie:backend-${VERSION}"
+        run: VERSION=${REF##*/} docker push "$docker_username/simple-fortune-cookie:backend-${VERSION}"
       - name: push frontend
-        run: docker push "$docker_username/simple-fortune-cookie:frontend-${VERSION}"
+        run: VERSION=${REF##*/} docker push "$docker_username/simple-fortune-cookie:frontend-${VERSION}"
   smoke-test:
     needs: docker-build
     name: build docker images and perform smoke-tests
     runs-on: ubuntu-latest
     env:
-      VERSION: ${GITHUB_REF##*/}
+      REF: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: docker-compose up -d
+        run: VERSION=${REF##*/} docker-compose up -d
       - name: test-frontend
         run: curl -s 172.17.0.1:8080 | grep "Fortune cookie application"
       - name: test-backend
@@ -50,24 +50,24 @@ jobs:
     runs-on: [self-hosted, staging]
     if: success() && github.ref != 'refs/heads/main'
     env:
-      VERSION: ${GITHUB_REF##*/}
+      REF: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v2
       - name: take down earlier deploy
         run: docker-compose down
       - name: docker-run
-        run: docker-compose up -d
+        run: VERSION=${REF##*/} docker-compose up -d
   deploy:
     needs: [docker-build, smoke-test]
     name: deploy docker images
     runs-on: [self-hosted, production]
     if: success() && github.ref == 'refs/heads/main'
     env:
-      VERSION: ${GITHUB_REF##*/}
+      REF: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v2
       - name: take down earlier deploy
         run: docker-compose down
       - name: docker-run
-        run: docker-compose up -d
+        run: VERSION=${REF##*/} docker-compose up -d
       
