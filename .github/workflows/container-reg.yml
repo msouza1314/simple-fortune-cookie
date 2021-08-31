@@ -34,4 +34,16 @@ jobs:
         run: curl -s 172.17.0.1:9000/fortunes | grep -v "404"
       - name: docker-stop
         run: docker-compose down
+  deploy:
+    needs: [docker-build, smoke-test]
+    name: deploy docker images
+    runs-on: self-hosted
+    on: 
+      push:
+        branch:
+          - main
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-run
+        run: docker-compose up -d
       
