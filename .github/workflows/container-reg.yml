@@ -22,7 +22,7 @@ jobs:
         run: docker push "$docker_username/simple-fortune-cookie:frontend"
   smoke-test:
     needs: docker-build
-    name: build docker images and curl 8080
+    name: build docker images and perform smoke-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,10 +38,7 @@ jobs:
     needs: [docker-build, smoke-test]
     name: deploy docker images
     runs-on: self-hosted
-    on: 
-      push:
-        branch:
-          - main
+    if: success() && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
