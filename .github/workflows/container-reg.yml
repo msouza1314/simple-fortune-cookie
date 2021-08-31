@@ -3,7 +3,13 @@ env:
   docker_password: ${{ secrets.DOCKER_PASSWORD }}
 
 name: Container Reg
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 jobs:
   docker-build:
     name: build docker images
