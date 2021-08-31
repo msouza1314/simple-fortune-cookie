@@ -11,33 +11,70 @@ on:
     branches:
       - main
 jobs:
-  docker-build:
+  docker-build-release:
     name: build docker images
     runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/main'
     env:
-      REF: ${{ github.ref }}
+      VERSION: release
     steps:
       - uses: actions/checkout@v2
       - name: build-backend
-        run: VERSION=${REF##*/} docker build -t "$docker_username/simple-fortune-cookie:backend-${VERSION}" -f backend.Dockerfile .
+        run: docker build -t "$docker_username/simple-fortune-cookie:backend-${VERSION}" -f backend.Dockerfile .
       - name: build-frontend
-        run: VERSION=${REF##*/} docker build -t "$docker_username/simple-fortune-cookie:frontend-${VERSION}" .
+        run: docker build -t "$docker_username/simple-fortune-cookie:frontend-${VERSION}" .
       - name: docker-login
         run: echo "$docker_password" | docker login --username "$docker_username" --password-stdin
       - name: push backend
-        run: VERSION=${REF##*/} docker push "$docker_username/simple-fortune-cookie:backend-${VERSION}"
+        run: docker push "$docker_username/simple-fortune-cookie:backend-${VERSION}"
       - name: push frontend
-        run: VERSION=${REF##*/} docker push "$docker_username/simple-fortune-cookie:frontend-${VERSION}"
-  smoke-test:
-    needs: docker-build
+        run: docker push "$docker_username/simple-fortune-cookie:frontend-${VERSION}"
+  smoke-test-release:
+    needs: docker-build-release
     name: build docker images and perform smoke-tests
     runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/dev'
     env:
-      REF: ${{ github.ref }}
+      VERSION: release
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: VERSION=${REF##*/} docker-compose up -d
+        run: docker-compose up -d
+      - name: test-frontend
+        run: curl -s 172.17.0.1:8080 | grep "Fortune cookie application"
+      - name: test-backend
+        run: curl -s 172.17.0.1:9000/fortunes | grep -v "404"
+      - name: docker-stop
+        run: docker-compose down
+  docker-build-staging:
+    name: build docker images
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/dev'
+    env:
+      VERSION: development
+    steps:
+      - uses: actions/checkout@v2
+      - name: build-backend
+        run: docker build -t "$docker_username/simple-fortune-cookie:backend-${VERSION}" -f backend.Dockerfile .
+      - name: build-frontend
+        run: docker build -t "$docker_username/simple-fortune-cookie:frontend-${VERSION}" .
+      - name: docker-login
+        run: echo "$docker_password" | docker login --username "$docker_username" --password-stdin
+      - name: push backend
+        run: docker push "$docker_username/simple-fortune-cookie:backend-${VERSION}"
+      - name: push frontend
+        run: docker push "$docker_username/simple-fortune-cookie:frontend-${VERSION}"
+  smoke-test-staging:
+    needs: docker-build-staging
+    name: build docker images and perform smoke-tests
+    runs-on: ubuntu-latest
+    if: success() && github.ref == 'refs/heads/dev'
+    env:
+      VERSION: development
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-run
+        run: docker-compose up -d
       - name: test-frontend
         run: curl -s 172.17.0.1:8080 | grep "Fortune cookie application"
       - name: test-backend
@@ -45,29 +82,29 @@ jobs:
       - name: docker-stop
         run: docker-compose down
   deploy-staging:
-    needs: [docker-build, smoke-test]
+    needs: [docker-build-staging, smoke-test-staging]
     name: deploy docker images
     runs-on: [self-hosted, staging]
-    if: success() && github.ref != 'refs/heads/main'
+    if: success() && github.ref == 'refs/heads/dev'
     env:
-      REF: ${{ github.ref }}
+      VERSION: development
     steps:
       - uses: actions/checkout@v2
       - name: take down earlier deploy
         run: docker-compose down
       - name: docker-run
-        run: VERSION=${REF##*/} docker-compose up -d
-  deploy:
-    needs: [docker-build, smoke-test]
+        run: docker-compose up -d
+  deploy-release:
+    needs: [docker-build-release, smoke-test-release]
     name: deploy docker images
     runs-on: [self-hosted, production]
     if: success() && github.ref == 'refs/heads/main'
     env:
-      REF: ${{ github.ref }}
+      VERSION: release
     steps:
       - uses: actions/checkout@v2
       - name: take down earlier deploy
         run: docker-compose down
       - name: docker-run
-        run: VERSION=${REF##*/} docker-compose up -d
+        run: docker-compose up -d
       
