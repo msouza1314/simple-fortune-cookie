@@ -33,7 +33,7 @@ jobs:
     needs: docker-build-release
     name: build docker images and perform smoke-tests
     runs-on: ubuntu-latest
-    if: success() && github.ref == 'refs/heads/dev'
+    if: success() && github.ref == 'refs/heads/main'
     env:
       VERSION: release
     steps:
