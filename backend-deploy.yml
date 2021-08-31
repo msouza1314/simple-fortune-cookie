@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: sfc-backend
+  name: sfc-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sfc-backend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: sfc-backend
+    spec:
+      containers:
+      - image: msouza1314/simple-fortune-cookie:backend-release
+        name: simple-fortune-cookie
+        ports:
+        - containerPort: 9000
+        resources: {}
+status: {}
