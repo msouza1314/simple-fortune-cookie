@@ -1,0 +1,17 @@
+env:
+  docker_username: ${{ secrets.DOCKER_USERNAME }}
+
+name: Deploy
+on: 
+  push:
+    branch:
+      - main
+jobs:
+  smoke-test:
+    needs: docker-build
+    name: build docker images
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-run
+        run: docker-compose up -d
