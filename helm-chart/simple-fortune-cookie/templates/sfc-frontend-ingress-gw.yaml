@@ -12,4 +12,4 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - {{ deployNamespace }}.sfc-app-frontend.istio.eficode.academy
+    - {{ .Values.deployNamespace }}.sfc-app-frontend.istio.eficode.academy
