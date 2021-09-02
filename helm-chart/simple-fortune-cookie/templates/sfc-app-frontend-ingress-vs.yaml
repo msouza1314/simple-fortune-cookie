@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: sfc-app-frontend
+spec:
+  hosts:
+  - "user7.sfc-app-frontend.istio.eficode.academy"
+  gateways:
+  - sfc-app-frontend
+  http:
+  - route:
+    - destination:
+        host: sfc-frontend
