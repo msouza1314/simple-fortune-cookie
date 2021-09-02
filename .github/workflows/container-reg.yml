@@ -94,6 +94,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: get k8s namespace
         run: export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo`
+      - name: sanity check
+        run: echo ${NS}
       - name: deploy with helm
         run: helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployVersion=${VERSION} --set deployNamespace=${NS}
   deploy-release:
@@ -107,6 +109,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: get k8s namespace
         run: export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo`
+      - name: sanity check
+        run: echo ${NS}
       - name: deploy with helm
         run: helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployNamespace=${NS}
       
