@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: helm install helm-chart/simple-fortune-cookie --set deployVersion=${VERSION}
+        run: helm install sfc-app helm-chart/simple-fortune-cookie --set deployVersion=${VERSION}
   deploy-release:
     needs: [docker-build-release, smoke-test-release]
     name: deploy docker images
@@ -104,5 +104,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: helm install helm-chart/simple-fortune-cookie
+        run: helm install sfc-app helm-chart/simple-fortune-cookie
       
