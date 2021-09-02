@@ -105,7 +105,6 @@ jobs:
       VERSION: release
     steps:
       - uses: actions/checkout@v2
-      - name: docker-run
       - name: get k8s namespace
         run: export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo`
       - name: deploy with helm
