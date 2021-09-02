@@ -20,6 +20,9 @@ spec:
       containers:
       - image: msouza1314/simple-fortune-cookie:backend-{{ .Values.deployVersion }}
         name: simple-fortune-cookie
+        env:
+        - name: REDIS_DNS
+          value: redis
         ports:
         - containerPort: 9000
         resources: {}
