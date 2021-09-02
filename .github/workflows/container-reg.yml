@@ -93,7 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: EXPORT NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` && \
+        run: NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` \
              helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployVersion=${VERSION} --set deployNamespace=${NS}
   deploy-release:
     needs: [docker-build-release, smoke-test-release]
@@ -105,6 +105,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: docker-run
-        run: EXPORT NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` && \
+        run: NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` \
              helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployNamespace=${NS}
       
