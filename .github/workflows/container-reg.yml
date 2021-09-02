@@ -92,8 +92,6 @@ jobs:
       VERSION: development
     steps:
       - uses: actions/checkout@v2
-      - name: take down earlier deploy
-        run: docker-compose down
       - name: docker-run
         run: docker-compose up -d
   deploy-release:
@@ -105,8 +103,6 @@ jobs:
       VERSION: release
     steps:
       - uses: actions/checkout@v2
-      - name: take down earlier deploy
-        run: docker-compose down
       - name: docker-run
         run: docker-compose up -d
       
