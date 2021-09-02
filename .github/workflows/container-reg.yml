@@ -92,12 +92,11 @@ jobs:
       VERSION: development
     steps:
       - uses: actions/checkout@v2
-      - name: get k8s namespace
-        run: export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo`
-      - name: sanity check
-        run: echo ${NS}
-      - name: deploy with helm
-        run: helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployVersion=${VERSION} --set deployNamespace=${NS}
+      - name: deploy to k8s namespace
+        run: |
+          export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` && \
+          echo ${NS} && \
+          helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployVersion=${VERSION} --set deployNamespace=${NS}
   deploy-release:
     needs: [docker-build-release, smoke-test-release]
     name: deploy docker images
@@ -107,10 +106,9 @@ jobs:
       VERSION: release
     steps:
       - uses: actions/checkout@v2
-      - name: get k8s namespace
-        run: export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo`
-      - name: sanity check
-        run: echo ${NS}
-      - name: deploy with helm
-        run: helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployNamespace=${NS}
+      - name: deploy to k8s namespace
+        run: |
+          export NS=`kubectl config view --output 'jsonpath={..namespace}'; echo` && \
+          echo ${NS} && \
+          helm upgrade --install sfc-app helm-chart/simple-fortune-cookie --set deployNamespace=${NS}
       
