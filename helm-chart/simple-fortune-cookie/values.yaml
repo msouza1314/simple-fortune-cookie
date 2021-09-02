@@ -1,0 +1,9 @@
+
+deployVersion: release
+
+service:
+  port: 8080
+  type: LoadBalancer
+
+ingress:
+  enabled: false
