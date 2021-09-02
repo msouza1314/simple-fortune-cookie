@@ -1,6 +1,8 @@
 
 deployVersion: release
 
+deployNamespace: user1
+
 service:
   port: 8080
   type: LoadBalancer
