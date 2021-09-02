@@ -10,6 +10,7 @@ spec:
   - port: {{ .Values.service.port }}
     protocol: TCP
     targetPort: {{ .Values.service.port }}
+    appProtocol: http
   selector:
     app: sfc-frontend
   type: {{ .Values.service.type }}
